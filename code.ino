@@ -33,7 +33,7 @@ void CheckGas()
     sensorValue = ScanGasLevel();       // read analog input pin 0
     Serial.println(sensorValue, DEC);  // prints the value read
     delay(100); // wait 100ms for next 
-    if(sensorValue>800)
+    if(sensorValue>600)
     {
       
       SetAlert();
@@ -65,7 +65,7 @@ void CheckShutDown()
     {
     
       Gas_shut_val=ScanGasLevel();                                                   //scan the gas level
-      if(Gas_shut_val<800)
+      if(Gas_shut_val<600)
       {
         noTone(13);                                                                  //stop the buzzer
         sms_count=0;
@@ -192,11 +192,11 @@ String show()
       token=strtok(NULL,s);
     }
    
-   pass= "http://google.co.in/maps/@";
+   pass= "http://maps.google.com/?q=";
    pass.concat(loc[2]);
    pass.concat(",");
    pass.concat(loc[1]);
-   pass.concat(",15z");
+ 
    //Serial.print(pass);
    return pass;
 }
