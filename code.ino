@@ -9,14 +9,23 @@ int sms_count=0;
 int sensorValue;
 int flg=0;
 int GasSensorPin = A0;
-String s2;
+String location;
+
+/* Variables for fetching Co-ordinates */
+int i=0;
+String pass;
+char *token;
+char response[800],fin[30];
+String loc[2];
+
+
 void setup()
 {
 
     pinMode(sensor,INPUT);
     SIM900.begin(9600);   
     Serial.begin(9600);
-    s2=show(); 
+    location=show(); 
     delay(500);
 
 }
@@ -44,7 +53,6 @@ void CheckGas()
 int ScanGasLevel()
 {
      sensorValue = analogRead(GasSensorPin); // read analog input pin 0
-     Serial.println(sensorValue, DEC);  // prints the value read
      delay(100); // wait 100ms for next reading
      return sensorValue; // returns temperature value in degree celsius
 }
@@ -64,10 +72,10 @@ void CheckShutDown()
     if(Gas_Leak_Status==1)
     {
     
-      Gas_shut_val=ScanGasLevel();                                                   //scan the gas level
+      Gas_shut_val=ScanGasLevel();     //scan the gas level
       if(Gas_shut_val<600)
-      {
-        noTone(13);                                                                  //stop the buzzer
+	  {
+        noTone(13);                    //stop the buzzer
         sms_count=0;
         Gas_Leak_Status=0;
       }
@@ -84,22 +92,15 @@ void SendTextMessage()
   SIM900.println("AT+CMGS=\"+917350617969\"\r"); // change to the phone number you using 
   delay(1000);
   
-  SIM900.println("Leak Detected!!!\n location:"+s2);//the content of the message
+  SIM900.println("Leak Detected!!!\n location:"+location);//the content of the message
   delay(200);
-  SIM900.println((char)26);//the stopping character
+  SIM900.println((char)26); //the stopping character
   delay(1000);
   delay(1000);
   sms_count++;
 }
 
 
-
-int i=0;
-String pass;
-char *token;
-const char s[2]=",";
-char a[800],fin[30];
-String loc[3];
 
 
 
@@ -109,8 +110,8 @@ void ShowSerialData()
   while(SIM900.available()!=0)
   {
     //Serial.write(char (SIM900.read()));
-     a[i]=char (SIM900.read());
-     Serial.print(a[i++]);
+     response[i]=char (SIM900.read());
+     Serial.print(response[i++]);
      
   }
 
@@ -143,14 +144,14 @@ String show()
   delay(4000);
   ShowSerialData();
  
-  SIM900.println("AT+SAPBR=1,1");//setting the SAPBR
+  SIM900.println("AT+SAPBR=1,1");//Openig the bearer having identifier 1
 
   delay(2000);
 
  
   ShowSerialData();
 
-  SIM900.println("AT+SAPBR=2,1");//setting the SAPBR
+  SIM900.println("AT+SAPBR=2,1");//query the bearer having identifier 1
   delay(2000);
  
   ShowSerialData();
@@ -161,42 +162,42 @@ String show()
   
   ShowSerialData();
   
-  SIM900.println("AT+CIPGSMLOC=2,1");//setting the SAPBR
+  SIM900.println("AT+CIPGSMLOC=2,1");//querying for the location
   
   delay(2000);
   
   ShowSerialData();
 
 
-  SIM900.println("AT+SAPBR=0,1");//Deactivating the SAPBR
+  SIM900.println("AT+SAPBR=0,1");//Deactivating the bearer having identifier 1
   delay(2000);
  
   ShowSerialData();
-
- 
 
 
   int j=0;
-   for(i=200;i<222;++i)
-   {
-        fin[j]=a[i];j++;
-   }
-   String str(fin);
-   token=strtok(fin, s);
-   int x=0;
-   while(token!=NULL)
-   {
-      if(x<3)
-        loc[x]=token;
-      x++;
-      token=strtok(NULL,s);
-    }
-   
-   pass= "http://maps.google.com/?q=";
-   pass.concat(loc[2]);
-   pass.concat(",");
-   pass.concat(loc[1]);
- 
-   //Serial.print(pass);
-   return pass;
+
+  
+  for(i=200;i<222;++i)
+  {
+       fin[j]=response[i];
+	   j++;
+  }
+  String str(fin);
+  token=strtok(fin, ",");
+  int x=0;
+  while(token!=NULL)
+  {
+     if(x<2)
+       loc[x]=token;
+     x++;
+     token=strtok(NULL,",");
+  }
+  
+  pass= "http://maps.google.com/?q=";
+  pass.concat(loc[2]);
+  pass.concat(",");
+  pass.concat(loc[1]);
+  //Serial.print(pass);
+  return pass;
 }
