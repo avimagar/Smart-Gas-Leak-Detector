@@ -7,4 +7,4 @@ Software tools:Arduino IDE
 
 Hardware Tools: Arduino UNO, SIM900 GSM Module, MQ6 Sensor, Buzzer
 
-Demo Link: https://drive.google.com/open?id=0B_3FJmqe9naDY2lEMnJsd28zbE0
+Demo Link: https://drive.google.com/file/d/0B_3FJmqe9naDY2lEMnJsd28zbE0/view?usp=sharing&resourcekey=0-mElzvzYTQUvGH4qI_TqnaA
